@@ -1,3 +1,12 @@
+# GroupMeRedditBot specific directories and files
+logs/
+keystore/
+reddit-json/
+pickles/
+RedditArchives.db
+blacklisted_subs.csv
+known_subs.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
