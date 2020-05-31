@@ -16,7 +16,6 @@
    limitations under the License.
 '''
 
-import groupme
 import json
 import keystore
 import os
@@ -76,7 +75,7 @@ def get_reddit_archive(subreddit):
 def download_hot_list(subreddit, afterId):
     reddit_url = 'http://api.reddit.com/r/{0}/hot?over_18=true'.format(subreddit)
 
-    print "Reddit url is", reddit_url
+    print("Reddit url is", reddit_url)
     if afterId is not None:
         reddit_url += '&after=' + afterId
 
@@ -91,7 +90,7 @@ def download_hot_list(subreddit, afterId):
             return jsonDict
         except ValueError:
             error = 'Value error when getting json for /r/' + subreddit
-            print error
+            print(error)
             return error
     else:
         if r.status_code == 404:
@@ -101,11 +100,11 @@ def download_hot_list(subreddit, afterId):
             return 'Reddit is rate-limiting rbot, sleeping for 15 minutes'
         elif r.status_code == 403:
             message = "Failed to download /r/{0}, it may be private ({1})".format(subreddit, r.status_code)
-            print message
+            print(message)
             return message
         else:
             message = "Failed to download /r/{0}, got status code {1}".format(subreddit, r.status_code)
-            print message
+            print(message)
             return message
 
 def save_json_to_file(jsonDict, fileName):
@@ -114,11 +113,11 @@ def save_json_to_file(jsonDict, fileName):
             json_file.write(json.dumps(jsonDict))
 
 def update_archive(archive):
-    print "Updating archive", archive.subreddit
+    print("Updating archive", archive.subreddit)
 
     result = download_hot_list(archive.subreddit, None)
     
-    print result
+    print(result)
     if type(result) is str:
         return result
     
@@ -152,8 +151,9 @@ def save_recent_urls(bot_id, recentUrls):
     if not os.path.exists(pickles_directory):
         os.makedirs(pickles_directory)
 
-    recentURLsFileName = '{0}/recentURLS-{1}.pickle'.format(pickles_directory, bot_id)
-    with open(recentURLsFileName, 'w+') as recentUrlsFile:
+    recentURLsFileName = '{0}/recentURLS.pickle'.format(pickles_directory)
+    with open(recentURLsFileName, 'wb') as recentUrlsFile:
+        #data = recentUrlsFile.read()
         pickle.dump(recentUrls[:500], recentUrlsFile)
 
 def get_recent_urls(bot_id):
@@ -161,18 +161,20 @@ def get_recent_urls(bot_id):
     if not os.path.exists(pickles_directory):
         os.makedirs(pickles_directory)
 
-    recentURLsFileName = '{0}/recentURLS-{1}.pickle'.format(pickles_directory, bot_id)
+    recentURLsFileName = '{0}/recentURLS.pickle'.format(pickles_directory)
     
     recentUrls = list()
-    
     if os.path.isfile(recentURLsFileName):
-        with open(recentURLsFileName, 'r') as recentUrlsFile:
-            recentUrls = pickle.load(recentUrlsFile)
+        if os.path.getsize(recentURLsFileName) > 0: 
+            with open(recentURLsFileName, 'rb') as recentUrlsFile:
+                #data = recentUrlsFile.read()
+                #print(type(data))
+                recentUrls = pickle.load(recentUrlsFile)
 
     return recentUrls
 
 def subreddit_exists(subreddit):
-    print "subreddit_exists(", subreddit, ")"
+    print("subreddit_exists(", subreddit, ")")
     subredditResult = SubredditResult()
 
     archive = get_reddit_archive(subreddit)
@@ -256,7 +258,7 @@ def get_url_from_subreddit(bot_id, subreddit):
     url = get_unused_url_from_json(bot_id, posts)
 
     if url is None:
-        print 'Url is None, downloading new json to get url'
+        print('Url is None, downloading new json to get url')
 
         reddit_json_directory = 'reddit-json'
         if not os.path.exists(reddit_json_directory):
@@ -281,7 +283,7 @@ def get_url_from_subreddit(bot_id, subreddit):
         
             posts = jsonDict["data"]["children"]
             url = get_unused_url_from_json(bot_id, posts)
-            print "Got url", url, "from second try"
+            print("Got url", url, "from second try")
 
     return url 
 
